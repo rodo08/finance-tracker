@@ -21,6 +21,9 @@ export const FinancialRecordsContext = createContext<
   FinancialRecordsContextType | undefined
 >(undefined);
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+
 export const FinancialRecordsProvider = ({
   children,
 }: {
@@ -32,7 +35,7 @@ export const FinancialRecordsProvider = ({
   const fetchRecords = async () => {
     if (!user) return;
     const response = await fetch(
-      `http://localhost:3001/financial-records/getAllByUserID/${user?.id}`
+      `${API_BASE_URL}/financial-records/getAllByUserID/${user?.id}`
     );
 
     if (response.ok) {
@@ -47,7 +50,7 @@ export const FinancialRecordsProvider = ({
   }, [user]);
 
   const addRecord = async (record: FinancialRecord) => {
-    const response = await fetch("http://localhost:3001/financial-records", {
+    const response = await fetch(`${API_BASE_URL}/financial-records`, {
       method: "POST",
       body: JSON.stringify(record),
       headers: {
@@ -66,16 +69,13 @@ export const FinancialRecordsProvider = ({
   };
 
   const updateRecord = async (id: string, newRecord: FinancialRecord) => {
-    const response = await fetch(
-      `http://localhost:3001/financial-records/${id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(newRecord),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${API_BASE_URL}/financial-records/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(newRecord),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     try {
       if (response.ok) {
@@ -96,12 +96,9 @@ export const FinancialRecordsProvider = ({
   };
 
   const deleteRecord = async (id: string) => {
-    const response = await fetch(
-      `http://localhost:3001/financial-records/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    const response = await fetch(`${API_BASE_URL}/financial-records/${id}`, {
+      method: "DELETE",
+    });
 
     try {
       if (response.ok) {
