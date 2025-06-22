@@ -8,6 +8,7 @@ export interface FinancialRecord {
   amount: number;
   category: string;
   paymentMethod: string;
+  userId?: string; // opcional en frontend, pero se enviará
 }
 
 interface FinancialRecordsContextType {
@@ -35,7 +36,7 @@ export const FinancialRecordsProvider = ({
   const fetchRecords = async () => {
     if (!user) return;
     const response = await fetch(
-      `${API_BASE_URL}/financial-records/getAllByUserID/${user?.id}`
+      `${API_BASE_URL}/financial-records/getAllByUserID/${user.id}`
     );
 
     if (response.ok) {
@@ -50,9 +51,13 @@ export const FinancialRecordsProvider = ({
   }, [user]);
 
   const addRecord = async (record: FinancialRecord) => {
+    if (!user) return;
+    // Añadimos userId para que el backend lo reciba
+    const recordWithUserId = { ...record, userId: user.id };
+
     const response = await fetch(`${API_BASE_URL}/financial-records`, {
       method: "POST",
-      body: JSON.stringify(record),
+      body: JSON.stringify(recordWithUserId),
       headers: {
         "Content-Type": "application/json",
       },
@@ -69,9 +74,12 @@ export const FinancialRecordsProvider = ({
   };
 
   const updateRecord = async (id: string, newRecord: FinancialRecord) => {
+    if (!user) return;
+    const recordWithUserId = { ...newRecord, userId: user.id };
+
     const response = await fetch(`${API_BASE_URL}/financial-records/${id}`, {
       method: "PUT",
-      body: JSON.stringify(newRecord),
+      body: JSON.stringify(recordWithUserId),
       headers: {
         "Content-Type": "application/json",
       },
@@ -79,15 +87,9 @@ export const FinancialRecordsProvider = ({
 
     try {
       if (response.ok) {
-        const newRecord = await response.json();
+        const updatedRecord = await response.json();
         setRecords((prev) =>
-          prev.map((record) => {
-            if (record._id === id) {
-              return newRecord;
-            } else {
-              return record;
-            }
-          })
+          prev.map((record) => (record._id === id ? updatedRecord : record))
         );
       }
     } catch (err) {
