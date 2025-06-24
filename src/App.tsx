@@ -5,12 +5,20 @@ import { Auth } from "./pages/auth";
 import { FinancialRecordsProvider } from "./contexts/financialRecordContext";
 import { SignedIn, UserButton } from "@clerk/clerk-react";
 import { dark } from "@clerk/themes";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Finance } from "./components/FinanceTrackerLogo";
+
 function App() {
   return (
     <Router>
       <div className="container">
         <header className="header">
-          <Link to="/auth">Dashboard</Link>
+          <Link to="/">
+            <div>
+              <Finance />
+              <span>Finance Tracker</span>
+            </div>
+          </Link>
           <SignedIn>
             <UserButton showName appearance={{ baseTheme: dark }} />
           </SignedIn>
@@ -19,9 +27,11 @@ function App() {
           <Route
             path="/"
             element={
-              <FinancialRecordsProvider>
-                <Dashboard />
-              </FinancialRecordsProvider>
+              <ProtectedRoute>
+                <FinancialRecordsProvider>
+                  <Dashboard />
+                </FinancialRecordsProvider>
+              </ProtectedRoute>
             }
           />
           <Route path="/auth" element={<Auth />} />
